@@ -1,28 +1,17 @@
 const express = require('express');
-
-const booksRoutes = require ('../P7-Backend/routes/books.js')
 const app = express();
+const booksRoutes = require ('../P7-Backend/routes/books.js')
+const Book = require('./models/book.js')
 
+// Middleware pour parser le corps des requêtes en JSON
+app.use(express.json());
 
-
-
+// Middleware pour gérer les CORS
 app.use((req, res, next) => {
-  console.log('Requête reçue !');
-  next();
-});
-
-app.use((req, res, next) => {
-  res.status(201);
-  next();
-});
-
-app.use((req, res, next) => {
-  res.json({ message: 'Votre requête a bien été reçue !' });
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log('Réponse envoyée avec succès !');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    next();
 });
 
 module.exports = app;
