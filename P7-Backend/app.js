@@ -1,6 +1,10 @@
 const express = require('express');
 
+const booksRoutes = require ('../P7-Backend/routes/books.js')
 const app = express();
+
+
+
 
 app.use((req, res, next) => {
   console.log('Requête reçue !');
