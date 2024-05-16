@@ -1,9 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const app = express();
-const booksRoutes = require ('./routes/books.js')
-const Book = require('./models/book.js')
+const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
+
 
 // BDD
 mongoose.connect('mongodb+srv://bookworm:A1dDBpGmgzQvKW6J@cluster1.socejwe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1',
@@ -11,6 +10,7 @@ mongoose.connect('mongodb+srv://bookworm:A1dDBpGmgzQvKW6J@cluster1.socejwe.mongo
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
+
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(express.json());
@@ -23,6 +23,8 @@ app.use((req, res, next) => {
     next();
 });
 
+
+//routeurs
 app.use('/api/auth', userRoutes);
 
 module.exports = app;
