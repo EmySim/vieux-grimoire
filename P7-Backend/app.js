@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
+const booksRoutes = require('./routes/books');
+const path = require('path');
 
 
 // BDD
@@ -23,8 +25,10 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 //routeurs
+app.use('/api/books', booksRoutes);
 app.use('/api/auth', userRoutes);
 
 module.exports = app;
