@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
-const imgConfig = require('../middleware/img-config');
+const { upload, resizeImage } = require('../middleware/upload');
 const booksCtrl = require('../controllers/books');
 
 
 router.get('/', booksCtrl.library);
-router.get('/:id', bookCtrl.oneBook);
-router.get('/', bookCtrl.bestBooks);
-router.post('/', auth, imgConfig, bookCtrl.addBook);
-router.put('/:id', auth, imgConfig, booksCtrl.updateBook );
+router.get('/:id', booksCtrl.oneBook);
+//router.get('/', booksCtrl.bestBooks);
+router.post('/', auth, upload, resizeImage, booksCtrl.addBook);
+router.put('/:id', auth, upload, resizeImage, booksCtrl.updateBook );
 router.delete('/:id', auth, booksCtrl.deleteBook);
-router.post('/:id', auth, booksCtrl.rateBook);
+//router.post('/:id', auth, booksCtrl.rateBook);
 
 module.exports = router;
