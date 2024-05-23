@@ -43,7 +43,7 @@ const resizeImage = (req, res, next) => {
     .toFile(outputFilePath)
     .then(() => {
       //remplace par le fichier redimensionné
-      fs.unlink(filePath, () => {
+      fs.unlink(filePath, (err) => {
         if (err) {
           console.error(err);
           return next(err);
@@ -55,7 +55,7 @@ const resizeImage = (req, res, next) => {
     })
     .catch(err => {
       console.log(err);
-      return next();
+      return next(err);
     });
 };
 

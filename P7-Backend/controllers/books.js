@@ -1,4 +1,4 @@
-const Books = require("../models/book");
+const Book = require("../models/book");
 const fs = require("fs");
 
 //get - renvoie à la bibliothèque (plusieurs livres)
