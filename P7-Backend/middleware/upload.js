@@ -18,26 +18,28 @@ const storage = multer.diskStorage({
 
   //nom de fichier
   filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_');
+    const name = file.originalname.split(' ').join('_').split('.')[0];
     const extension = MIME_TYPES[file.mimetype];
     callback(null, name + Date.now() + '.' + extension);
   }
 });
 
-module.exports = multer({ storage: storage }).single('image');
+// Middleware de téléchargement avec Multer
+const upload = multer({ storage: storage }).single('image');
 
-// Redimensionnement de l'image
-module.exports.resizeImage = (req, res, next) => {
+// Redimensionnement de l'image et conversion en WebP
+const resizeImage = (req, res, next) => {
   if (!req.file) {
     return next();
   }
 
   const filePath = req.file.path;
-  const fileName = req.file.filename;
-  const outputFilePath = path.join('images', `resized_${fileName}`);
+  const fileName = req.file.filename.split('.')[0]; 
+  const outputFilePath = path.join('images', `${fileName}.webp`);
 
   sharp(filePath)
     .resize({ width: 206, height: 260 })
+    .toFormat('webp')
     .toFile(outputFilePath)
     .then(() => {
       //remplace par le fichier redimensionné
@@ -47,7 +49,7 @@ module.exports.resizeImage = (req, res, next) => {
           return next(err);
         }
         req.file.path = outputFilePath;
-        req.file.filename = `resized_${fileName}`;
+        req.file.filename = `${fileName}.webp`;
         next();
       });
     })
@@ -56,4 +58,6 @@ module.exports.resizeImage = (req, res, next) => {
       return next();
     });
 };
+
+module.exports = { upload, resizeImage };
 

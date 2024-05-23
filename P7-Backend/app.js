@@ -4,10 +4,11 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/user');
 const booksRoutes = require('./routes/books');
 const path = require('path');
+require('dotenv').config();
 
 
 // BDD
-mongoose.connect('mongodb+srv://bookworm:A1dDBpGmgzQvKW6J@cluster1.socejwe.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1',
+mongoose.connect(process.env.MONGODB_URL,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
