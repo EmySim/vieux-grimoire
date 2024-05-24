@@ -97,6 +97,7 @@ exports.deleteBook = (req, res, next) => {
 
 //get - renvoie aux 3 livres les mieux notés
 exports.bestRating = (req, res, next) => {
+  //requete MongoDB utilisant Mongoose pour récupérer les meilleurs books selon leur moyenne
   Book.find().sort({ averageRating: -1 }).limit(3)
   .then((books) => {
     console.log('Best books:', books); 
@@ -106,9 +107,42 @@ exports.bestRating = (req, res, next) => {
 };
 
 
-//post - affecte une note (id)
+// post - affecte une note (id)
 exports.rateBook = (req, res, next) => {
-  Book.findOne({ _id: req.params.id });
+  const userId = req.auth.userId;
+  const { rating } = req.body;
+
+  if (rating < 0 || rating > 5) {
+    return res.status(400).json({ message: 'La note doit être comprise entre 0 et 5.' });
+  }
+
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      if (!book) {
+        return res.status(404).json({ message: 'Livre non trouvé.' });
+      }
+
+      const userRating = book.ratings.find(r => r.userId.toString() === userId);
+      if (userRating) {
+        return res.status(400).json({ message: 'Vous avez déjà noté ce livre.' });
+      }
+
+      // Ajouter la nouvelle note
+      book.ratings.push({ userId, grade: rating });
+
+      // Mettre à jour la moyenne des notes
+      const totalRatings = book.ratings.length;
+      const averageRating = book.ratings.reduce((sum, r) => sum + r.grade, 0) / totalRatings;
+      book.averageRating = averageRating;
+
+      // Sauvegarder les modifications
+      book.save()
+        .then(updatedBook => {
+          const updatedBookObject = updatedBook.toObject();
+          delete updatedBookObject.userId; // Supprimer le userId pour la réponse
+          res.status(200).json(updatedBookObject);
+        })
+        .catch(error => res.status(400).json({ error }));
+    })
+    .catch(error => res.status(400).json({ error }));
 };
-
-

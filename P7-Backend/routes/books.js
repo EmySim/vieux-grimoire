@@ -8,8 +8,8 @@ router.get('/bestrating', booksCtrl.bestRating);
 router.get('/', booksCtrl.library);
 router.get('/:id', booksCtrl.oneBook);
 router.post('/', auth, upload, resizeImage, booksCtrl.addBook);
-router.post('/:id', auth, booksCtrl.rateBook);
 router.put('/:id', auth, upload, resizeImage, booksCtrl.updateBook );
 router.delete('/:id', auth, booksCtrl.deleteBook);
+router.post('/:id/rating', auth, booksCtrl.rateBook);
 
 module.exports = router;
