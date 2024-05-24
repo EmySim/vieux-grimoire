@@ -15,14 +15,9 @@ exports.oneBook = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
-//get - renvoie aux livres les mieux notés
-//exports.bestBooks = (req, res, next) => {
-
-//};
-
 //post - ajoute un livre (id)
 exports.addBook = (req, res, next) => {
-  console.log('Request body.book:', req.body.book);
+  console.log("Request body.book:", req.body.book);
   //parse formdata => json
   const bookObject = JSON.parse(req.body.book);
   delete bookObject._id;
@@ -30,10 +25,13 @@ exports.addBook = (req, res, next) => {
   const book = new Book({
     ...bookObject,
     userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
+    imageUrl: `${req.protocol}://${req.get("host")}/images/${
+      req.file.filename
+    }`,
   });
 
-  book.save()
+  book
+    .save()
     .then(() => {
       res.status(201).json({ message: "Livre ajouté !" });
     })
@@ -44,25 +42,32 @@ exports.addBook = (req, res, next) => {
 
 //put - MAJ un livre (id)
 exports.updateBook = (req, res, next) => {
-    const bookObject = req.file ? {
+  const bookObject = req.file
+    ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
-  
-    delete bookObject._userId;
-    Book.findOne({_id: req.params.id})
-        .then((book) => {
-            if (book.userId != req.auth.userId) {
-                res.status(401).json({ message : 'Pas autorisé (MAJ)'});
-            } else {
-                Book.updateOne({ _id: req.params.id}, { ...bookObject, _id: req.params.id})
-                .then(() => res.status(200).json({message : 'Livre modifié!'}))
-                .catch(error => res.status(401).json({ error }));
-            }
-        })
-        .catch((error) => {
-            res.status(400).json({ error });
-        });
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+          req.file.filename
+        }`,
+      }
+    : { ...req.body };
+
+  delete bookObject._userId;
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      if (book.userId != req.auth.userId) {
+        res.status(401).json({ message: "Pas autorisé (MAJ)" });
+      } else {
+        Book.updateOne(
+          { _id: req.params.id },
+          { ...bookObject, _id: req.params.id }
+        )
+          .then(() => res.status(200).json({ message: "Livre modifié!" }))
+          .catch((error) => res.status(401).json({ error }));
+      }
+    })
+    .catch((error) => {
+      res.status(400).json({ error });
+    });
 };
 
 //delete
@@ -87,7 +92,17 @@ exports.deleteBook = (req, res, next) => {
     });
 };
 
+
+//RATINGS
+
+//get - renvoie aux livres les mieux notés
+exports.bestBooks = (req, res, next) => {
+  
+};
+
 //post - affecte une note (id)
-//exports.rateBook = (req, res, next) => {
-  //Book.findOne({ _id: req.params.id });
-//};
+exports.rateBook = (req, res, next) => {
+  Book.findOne({ _id: req.params.id });
+};
+
+
