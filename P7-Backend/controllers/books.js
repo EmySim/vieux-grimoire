@@ -95,10 +95,16 @@ exports.deleteBook = (req, res, next) => {
 
 //RATINGS
 
-//get - renvoie aux livres les mieux notés
-exports.bestBooks = (req, res, next) => {
-  
+//get - renvoie aux 3 livres les mieux notés
+exports.bestRating = (req, res, next) => {
+  Book.find().sort({ averageRating: -1 }).limit(3)
+  .then((books) => {
+    console.log('Best books:', books); 
+    res.status(200).json(books);
+  })
+  .catch((error) => res.status(400).json({ error }));
 };
+
 
 //post - affecte une note (id)
 exports.rateBook = (req, res, next) => {
