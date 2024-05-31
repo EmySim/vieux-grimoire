@@ -3,26 +3,6 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 
-/*// Définir les types la nature et le format 
-const MIME_TYPES = {
-  'image/jpg': 'jpg',
-  'image/jpeg': 'jpg',
-  'image/png': 'png'
-};
-
-
-
-  //nom de fichier
-  filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_').split('.')[0];
-    const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + '.' + extension);
-  }
-});
-
-// Middleware de téléchargement avec Multer
-const upload = multer({ storage: storage }).single('image');*/
-
 //configuration du stockage Multer dans la mémoire virtuelle
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single("image");

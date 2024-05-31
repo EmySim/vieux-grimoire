@@ -18,12 +18,12 @@ mongoose.connect(process.env.MONGODB_URL,
 // Middleware pour parser le corps des requêtes en JSON
 app.use(express.json());
 
-// Middleware pour gérer les CORS
+// Middleware pour gérer les CORS 
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    next();
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  next();
 });
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
