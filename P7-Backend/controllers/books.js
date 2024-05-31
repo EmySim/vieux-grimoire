@@ -58,23 +58,24 @@ exports.updateBook = (req, res, next) => {
         res.status(401).json({ message: "Pas autorisé (MAJ)" });
       }
       //effacer l'ancienne image
-      const oldImagePath = book.imageUrl
-        ? book.imageUrl.split("/images/")[1]
-        : null;
-
-      if (req.file && oldImagePath) {
-        fs.unlink(`images/${oldImagePath}`, (err) => {
-          if (err) {
-            console.error("Erreur lors de la suppression d'image", err);
+      const filename = book.imageUrl.split("/images/")[1];
+      console.log(filename);
+      if (fs.existsSync(`images/${filename}`)) {
+        fs.unlink(`images/${filename}`, (error) => {
+          if (error) {
+            throw new Error(error);
+            console.log("Erreur lors de la suppression d'image", err);
           }
         });
-      } else {
+
         Book.updateOne(
           { _id: req.params.id },
           { ...bookObject, _id: req.params.id }
         )
           .then(() => res.status(200).json({ message: "Livre modifié!" }))
           .catch((error) => res.status(401).json({ error }));
+      } else {
+        res.status(400).json({ message: "La photo n'existe pas!" });
       }
     })
     .catch((error) => {
