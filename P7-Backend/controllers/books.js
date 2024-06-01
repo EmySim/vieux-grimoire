@@ -57,6 +57,7 @@ exports.updateBook = (req, res, next) => {
       if (book.userId != req.auth.userId) {
         res.status(401).json({ message: "Pas autorisé (MAJ)" });
       }
+
       //effacer l'ancienne image
       const filename = book.imageUrl.split("/images/")[1];
       console.log(filename);
@@ -64,7 +65,6 @@ exports.updateBook = (req, res, next) => {
         fs.unlink(`images/${filename}`, (error) => {
           if (error) {
             throw new Error(error);
-            console.log("Erreur lors de la suppression d'image", err);
           }
         });
 

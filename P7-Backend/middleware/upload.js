@@ -3,6 +3,8 @@ const sharp = require("sharp");
 const path = require("path");
 const fs = require("fs");
 
+
+
 //configuration du stockage Multer dans la mémoire virtuelle
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single("image");
