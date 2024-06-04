@@ -55,7 +55,7 @@ exports.updateBook = (req, res, next) => {
         }`,
       }
     : { ...req.body };
-// Suppression de _userId auquel on ne peut faire confiance
+  // Suppression de _userId auquel on ne peut faire confiance
   delete bookObject._userId;
   // Récupération du livre existant à modifier
   Book.findOne({ _id: req.params.id })
@@ -67,14 +67,15 @@ exports.updateBook = (req, res, next) => {
       // Séparation du nom du fichier image existant
       const filename = book.imageUrl.split("/images/")[1];
       console.log(filename);
-       // Si l'image a été modifiée, on supprime l'ancienne
-      if (fs.existsSync(`images/${filename}`)) {
+
+      // Si l'image a été modifiée, on supprime l'ancienne
+      if (req.file && fs.existsSync(`images/${filename}`)) {
         fs.unlink(`images/${filename}`, (error) => {
           if (error) {
             throw new Error(error);
           }
         });
-
+      }
         // Mise à jour du livre
         Book.updateOne(
           { _id: req.params.id },
@@ -82,9 +83,9 @@ exports.updateBook = (req, res, next) => {
         )
           .then(() => res.status(200).json({ message: "Livre modifié!" }))
           .catch((error) => res.status(401).json({ error }));
-      } else {
+      /*} else {
         res.status(400).json({ message: "La photo n'existe pas!" });
-      }
+      }*/
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -164,7 +165,8 @@ exports.rateBook = (req, res, next) => {
       // Mettre à jour la moyenne des notes
       const totalRatings = book.ratings.length;
       const averageRating =
-        book.ratings.reduce((sum, rating) => sum + rating.grade, 0) / totalRatings;
+        book.ratings.reduce((sum, rating) => sum + rating.grade, 0) /
+        totalRatings;
       book.averageRating = Math.round(averageRating);
 
       // Sauvegarder les modifications
@@ -172,7 +174,7 @@ exports.rateBook = (req, res, next) => {
         .save()
         .then((updatedBook) => {
           const updatedBookObject = updatedBook.toObject();
-          delete updatedBookObject; 
+          delete updatedBookObject;
           res.status(200).json(updatedBookObject);
         })
         .catch((error) => res.status(400).json({ error }));

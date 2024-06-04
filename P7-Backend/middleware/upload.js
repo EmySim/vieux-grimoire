@@ -13,11 +13,13 @@ const resizeImage = (req, res, next) => {
     return next();
   }
 
+  // Le fichier image est contenu dans req.file.buffer
   const filePath = req.file.buffer;
   const fileName = req.file.originalname.split(".")[0];
   const outputFilePath = path.join("images", `${fileName}.webp`);
   console.log(outputFilePath);
 
+  // Utilisation de sharp pour redimensionner et convertir l'image en format WebP
   sharp(filePath)
     .resize({ width: 206, height: 260 })
     .toFormat("webp")
