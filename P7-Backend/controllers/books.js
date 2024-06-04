@@ -20,8 +20,11 @@ exports.addBook = (req, res, next) => {
   console.log("Request body.book:", req.body.book);
   //parse formdata => json
   const bookObject = JSON.parse(req.body.book);
+  // Suppression du faux _id envoyé par le front
   delete bookObject._id;
+  // Suppression de _userId auquel on ne peut faire confiance
   delete bookObject._userId;
+  // Création d'une instance du modèle Book
   const book = new Book({
     ...bookObject,
     userId: req.auth.userId,
@@ -30,6 +33,7 @@ exports.addBook = (req, res, next) => {
     }`,
   });
 
+  // Enregistrement dans la base de données
   book
     .save()
     .then(() => {
@@ -42,6 +46,7 @@ exports.addBook = (req, res, next) => {
 
 //put - MAJ un livre (id)
 exports.updateBook = (req, res, next) => {
+  // Stockage de la requête en JSON dans une constante
   const bookObject = req.file
     ? {
         ...JSON.parse(req.body.book),
@@ -50,17 +55,19 @@ exports.updateBook = (req, res, next) => {
         }`,
       }
     : { ...req.body };
-
+// Suppression de _userId auquel on ne peut faire confiance
   delete bookObject._userId;
+  // Récupération du livre existant à modifier
   Book.findOne({ _id: req.params.id })
     .then((book) => {
       if (book.userId != req.auth.userId) {
-        res.status(401).json({ message: "Pas autorisé (MAJ)" });
+        res.status(401).json({ message: "Mise à jour non autorisée" });
       }
 
-      //effacer l'ancienne image
+      // Séparation du nom du fichier image existant
       const filename = book.imageUrl.split("/images/")[1];
       console.log(filename);
+       // Si l'image a été modifiée, on supprime l'ancienne
       if (fs.existsSync(`images/${filename}`)) {
         fs.unlink(`images/${filename}`, (error) => {
           if (error) {
@@ -68,6 +75,7 @@ exports.updateBook = (req, res, next) => {
           }
         });
 
+        // Mise à jour du livre
         Book.updateOne(
           { _id: req.params.id },
           { ...bookObject, _id: req.params.id }
@@ -85,12 +93,16 @@ exports.updateBook = (req, res, next) => {
 
 //delete
 exports.deleteBook = (req, res, next) => {
+  // Récupération du livre à supprimer
   Book.findOne({ _id: req.params.id })
     .then((book) => {
+      // Le livre ne peut être supprimé que par le créateur de sa fiche
       if (book.userId != req.auth.userId) {
-        res.status(401).json({ message: "Pas autorisé (delete)" });
+        res.status(401).json({ message: "Suppression non autorisée" });
       } else {
+        // Séparation du nom du fichier image
         const filename = book.imageUrl.split("/images/")[1];
+        // Suppression du fichier image puis suppression du livre dans la base de données dans le callback
         fs.unlink(`images/${filename}`, () => {
           Book.deleteOne({ _id: req.params.id })
             .then(() => {
@@ -152,15 +164,15 @@ exports.rateBook = (req, res, next) => {
       // Mettre à jour la moyenne des notes
       const totalRatings = book.ratings.length;
       const averageRating =
-        book.ratings.reduce((sum, r) => sum + r.grade, 0) / totalRatings;
-      book.averageRating = averageRating;
+        book.ratings.reduce((sum, rating) => sum + rating.grade, 0) / totalRatings;
+      book.averageRating = Math.round(averageRating);
 
       // Sauvegarder les modifications
       book
         .save()
         .then((updatedBook) => {
           const updatedBookObject = updatedBook.toObject();
-          delete updatedBookObject.userId; // Supprimer le userId pour la réponse
+          delete updatedBookObject; 
           res.status(200).json(updatedBookObject);
         })
         .catch((error) => res.status(400).json({ error }));
